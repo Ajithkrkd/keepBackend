@@ -30,11 +30,10 @@ public class AuthenticationController {
         try {
             boolean existEmail = userService.isEmailExist(request.getEmail());
             if (existEmail) {
-                // Email already exists, return an error response
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(AuthenticationResponse.builder()
-                                .error("Email already exists")
-                                .build());
+                .body(AuthenticationResponse.builder()
+                .error("Email already exists")
+                .build());
             }
 
             AuthenticationResponse response = service.register(request);

@@ -4,6 +4,9 @@ import com.ajith.secondProject.auth.Requests.AuthenticationRequest;
 import com.ajith.secondProject.auth.Requests.RegisterRequest;
 import com.ajith.secondProject.auth.Response.AuthenticationResponse;
 import com.ajith.secondProject.config.JwtService;
+import com.ajith.secondProject.token.Token;
+import com.ajith.secondProject.token.TokenRepository;
+import com.ajith.secondProject.token.TokenType;
 import com.ajith.secondProject.user.Role;
 import com.ajith.secondProject.user.User;
 import com.ajith.secondProject.user.UserRepository;
@@ -23,6 +26,7 @@ public class AuthenticationService {
     private  final PasswordEncoder passwordEncoder;
     private  final JwtService jwtService;
     private  final AuthenticationManager authenticationManager;
+    private final TokenRepository tokenRepository;
     private final UserService userService;
     public AuthenticationResponse register (RegisterRequest request) {
         System.out.println (request );
@@ -31,15 +35,19 @@ public class AuthenticationService {
                 .lastName ( request.getLastName () )
                 .email ( request.getEmail () )
                 .password (passwordEncoder.encode (request.getPassword ()))
-                .role ( Role.ADMIN )
-
+                .role ( Role.USER )
                 .build ();
-        userRepository.save ( user );
+        User savedUser = userRepository.save ( user );
         var jwtToken = jwtService.generateToken ( user );
+        saveUserToken ( savedUser, jwtToken );
+
+
         return AuthenticationResponse.builder ( )
                 .token(jwtToken)
                 .build ( );
     }
+
+
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         try {
@@ -56,6 +64,8 @@ public class AuthenticationService {
                 throw new UserBlockedException ("User is blocked");
             }
             var jwtToken = jwtService.generateToken(user);
+            revokeAllTokens ( user );
+            saveUserToken ( user, jwtToken );
 
             return AuthenticationResponse.builder()
                     .token(jwtToken)
@@ -66,6 +76,30 @@ public class AuthenticationService {
         } catch (UsernameNotFoundException e) {
             throw new UsernameNotFoundException("User not found");
         }
+    }
+
+    private void revokeAllTokens(User user) {
+        var validUserTokens = tokenRepository.findAllValidTokensByUser ( user.getId () );
+        if(validUserTokens.isEmpty()) {
+            return;
+        }
+        else{
+                validUserTokens.forEach ( t ->{
+                    t.setRevoked ( true );
+                    t.setExpired ( true );}
+                 );
+                tokenRepository.saveAll ( validUserTokens );
+        }
+    }
+    private void saveUserToken (User user, String jwtToken) {
+        var token = Token.builder ( )
+                .user ( user )
+                .token ( jwtToken )
+                .tokenType ( TokenType.BEARER )
+                .expired ( false )
+                .revoked ( false )
+                .build ();
+        tokenRepository.save ( token );
     }
 
 }
