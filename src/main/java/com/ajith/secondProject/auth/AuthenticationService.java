@@ -11,13 +11,22 @@ import com.ajith.secondProject.user.Role;
 import com.ajith.secondProject.user.User;
 import com.ajith.secondProject.user.UserRepository;
 import com.ajith.secondProject.user.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +36,6 @@ public class AuthenticationService {
     private  final JwtService jwtService;
     private  final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
-    private final UserService userService;
     public AuthenticationResponse register (RegisterRequest request) {
         System.out.println (request );
         var user = User.builder ( )
@@ -39,11 +47,13 @@ public class AuthenticationService {
                 .build ();
         User savedUser = userRepository.save ( user );
         var jwtToken = jwtService.generateToken ( user );
-        saveUserToken ( savedUser, jwtToken );
+        var refreshToken = jwtService.generateRefreshToken ( user );
+        saveUserToken ( savedUser, refreshToken );
 
 
         return AuthenticationResponse.builder ( )
-                .token(jwtToken)
+                .accessToken (jwtToken)
+                .refreshToken ( refreshToken )
                 .build ( );
     }
 
@@ -64,11 +74,14 @@ public class AuthenticationService {
                 throw new UserBlockedException ("User is blocked");
             }
             var jwtToken = jwtService.generateToken(user);
+            var refreshToken = jwtService.generateRefreshToken ( user );
             revokeAllTokens ( user );
-            saveUserToken ( user, jwtToken );
+            saveUserToken ( user, refreshToken );
+
 
             return AuthenticationResponse.builder()
-                    .token(jwtToken)
+                    .accessToken (jwtToken)
+                    .refreshToken ( refreshToken )
                     .build();
         } catch (BadCredentialsException e) {
 
@@ -91,15 +104,59 @@ public class AuthenticationService {
                 tokenRepository.saveAll ( validUserTokens );
         }
     }
+
+
+    public AuthenticationResponse refreshToken (
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        final  String authHeader = request.getHeader("Authorization");
+        final String refreshToken;
+        final String userEmail;
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return AuthenticationResponse.builder()
+                    .error ( "Invalid Authorization header" )
+                    .build();
+        }
+
+
+        refreshToken = authHeader.substring(7);
+        userEmail = jwtService.extractUsername(refreshToken);
+        System.out.println (userEmail + "   ajith here to check" );
+        if(userEmail != null ){
+          Optional <User> existingUser = userRepository.findByEmail ( userEmail );
+          if(existingUser.isPresent ()){
+              User user = existingUser.get();
+            System.out.println (jwtService.isTokenValid ( refreshToken,user ) + "    valid");
+            if(jwtService.isTokenValid ( refreshToken, user ) ){
+              var accessToken = jwtService.generateToken ( user );
+              var newRefreshToken = jwtService.generateRefreshToken(user);
+
+              revokeAllTokens ( user );
+              saveUserToken ( user,newRefreshToken );
+
+              return AuthenticationResponse.builder ()
+                      .refreshToken ( newRefreshToken )
+                      .accessToken ( accessToken )
+                      .build ();
+
+            }
+          }
+        }
+
+        return AuthenticationResponse.builder()
+                .error("user not valid")
+        .build();
+    }
     private void saveUserToken (User user, String jwtToken) {
         var token = Token.builder ( )
                 .user ( user )
                 .token ( jwtToken )
                 .tokenType ( TokenType.BEARER )
+                .isRefreshToken ( true )
                 .expired ( false )
                 .revoked ( false )
                 .build ();
         tokenRepository.save ( token );
     }
-
 }

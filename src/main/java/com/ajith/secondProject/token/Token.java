@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "token")
 public class Token {
         @Id
         @GeneratedValue( strategy = GenerationType.IDENTITY )
@@ -19,6 +20,7 @@ public class Token {
                 private TokenType tokenType;
                 private  boolean expired;
                 private boolean revoked;
+                private boolean isRefreshToken;
         @ManyToOne
         @JoinColumn(name = "user_id")
                 private User user;

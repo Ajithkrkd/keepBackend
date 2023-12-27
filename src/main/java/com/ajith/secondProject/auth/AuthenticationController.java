@@ -8,6 +8,8 @@ import com.ajith.secondProject.user.Requests.UserDetailsUpdateRequest;
 import com.ajith.secondProject.user.Response.UserDetailsResponse;
 import com.ajith.secondProject.user.UserRepository;
 import com.ajith.secondProject.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping ("/api/auth")
@@ -69,6 +73,14 @@ public class AuthenticationController {
         }
     }
 
+    @PostMapping("/refresh-token")
+    private AuthenticationResponse refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        System.out.println ("Refreshing token" );
+        return  service.refreshToken(request, response);
+    }
     @GetMapping ("/details")
     public ResponseEntity<?> getUserDetails(@RequestHeader ("Authorization") String token) {
         try {
