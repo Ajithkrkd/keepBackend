@@ -109,6 +109,7 @@ public class AuthenticationService {
     public AuthenticationResponse refreshToken (
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
+
         final  String authHeader = request.getHeader("Authorization");
         final String refreshToken;
         final String userEmail;
@@ -122,30 +123,36 @@ public class AuthenticationService {
 
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
-        System.out.println (userEmail + "   ajith here to check" );
+
         if(userEmail != null ){
-          Optional <User> existingUser = userRepository.findByEmail ( userEmail );
-          if(existingUser.isPresent ()){
-              User user = existingUser.get();
-            System.out.println (jwtService.isTokenValid ( refreshToken,user ) + "    valid");
-            if(jwtService.isTokenValid ( refreshToken, user ) ){
-              var accessToken = jwtService.generateToken ( user );
-              var newRefreshToken = jwtService.generateRefreshToken(user);
+             Optional <User> existingUser = userRepository.findByEmail ( userEmail );
+                if(existingUser.isPresent ()){
+                    User user = existingUser.get();
 
-              revokeAllTokens ( user );
-              saveUserToken ( user,newRefreshToken );
+                    var isTokenValid = tokenRepository.findByToken ( refreshToken ).
+                            map ( token -> token.isRefreshToken ( ) &&
+                                    !token.isRevoked () &&
+                                    !token.isExpired () )
+                            .orElse ( false );
 
-              return AuthenticationResponse.builder ()
-                      .refreshToken ( newRefreshToken )
-                      .accessToken ( accessToken )
-                      .build ();
+                    if(jwtService.isTokenValid ( refreshToken, user ) && isTokenValid ){
+                      var accessToken = jwtService.generateToken ( user );
+                      var newRefreshToken = jwtService.generateRefreshToken(user);
 
-            }
-          }
+                          revokeAllTokens ( user );
+                          saveUserToken ( user,newRefreshToken );
+
+                          return AuthenticationResponse.builder ()
+                                  .refreshToken ( newRefreshToken )
+                                  .accessToken ( accessToken )
+                                  .build ();
+
+                    }
+                }
         }
 
         return AuthenticationResponse.builder()
-                .error("user not valid")
+                .error("Token is not valid Please Login or Register")
         .build();
     }
     private void saveUserToken (User user, String jwtToken) {
