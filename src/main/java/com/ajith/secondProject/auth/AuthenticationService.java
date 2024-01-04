@@ -109,7 +109,7 @@ public class AuthenticationService {
         final  String authHeader = request.getHeader("Authorization");
         final String refreshToken;
         final String userEmail;
-
+        System.out.println (authHeader + "--------------------="  );
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return AuthenticationResponse.builder()
                     .error ( "Invalid Authorization header" )
