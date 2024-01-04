@@ -1,5 +1,5 @@
 package com.ajith.secondProject.token;
-import com.ajith.secondProject.user.User;
+import com.ajith.secondProject.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

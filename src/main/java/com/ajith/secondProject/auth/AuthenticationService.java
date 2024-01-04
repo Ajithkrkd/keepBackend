@@ -8,21 +8,16 @@ import com.ajith.secondProject.token.Token;
 import com.ajith.secondProject.token.TokenRepository;
 import com.ajith.secondProject.token.TokenType;
 import com.ajith.secondProject.user.Role;
-import com.ajith.secondProject.user.User;
-import com.ajith.secondProject.user.UserRepository;
-import com.ajith.secondProject.user.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ajith.secondProject.user.entity.User;
+import com.ajith.secondProject.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -48,6 +43,11 @@ public class AuthenticationService {
         User savedUser = userRepository.save ( user );
         var jwtToken = jwtService.generateToken ( user );
         var refreshToken = jwtService.generateRefreshToken ( user );
+        if(jwtToken.equals ( refreshToken ) ){
+            System.out.println ("---------------------------------------dupli" );
+        }else{
+            System.out.println ("---------------------------------------not dupli" );
+        }
         saveUserToken ( savedUser, refreshToken );
 
 
@@ -75,6 +75,11 @@ public class AuthenticationService {
             }
             var jwtToken = jwtService.generateToken(user);
             var refreshToken = jwtService.generateRefreshToken ( user );
+            if(jwtToken.equals ( refreshToken ) ){
+                System.out.println ("---------------------------------------dupli" );
+            }else{
+                System.out.println ("---------------------------------------not dupli" );
+            }
             revokeAllTokens ( user );
             saveUserToken ( user, refreshToken );
 

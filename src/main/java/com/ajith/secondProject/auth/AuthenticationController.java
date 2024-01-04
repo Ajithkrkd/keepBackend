@@ -6,7 +6,7 @@ import com.ajith.secondProject.auth.Response.AuthenticationResponse;
 import com.ajith.secondProject.user.Exceptions.CustomAuthenticationException;
 import com.ajith.secondProject.user.Requests.UserDetailsUpdateRequest;
 import com.ajith.secondProject.user.Response.UserDetailsResponse;
-import com.ajith.secondProject.user.UserRepository;
+import com.ajith.secondProject.user.repository.UserRepository;
 import com.ajith.secondProject.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 

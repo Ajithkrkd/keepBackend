@@ -3,8 +3,8 @@ import com.ajith.secondProject.config.JwtService;
 import com.ajith.secondProject.user.Exceptions.CustomAuthenticationException;
 import com.ajith.secondProject.user.Requests.UserDetailsUpdateRequest;
 import com.ajith.secondProject.user.Response.UserDetailsResponse;
-import com.ajith.secondProject.user.User;
-import com.ajith.secondProject.user.UserRepository;
+import com.ajith.secondProject.user.entity.User;
+import com.ajith.secondProject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,17 +28,12 @@ public class UserServiceImpl implements UserService {
             String userEmail = jwtService.extractUsername(token);
             String username = jwtService.extractUsername(token);
             Optional< User > userOptional = userRepository.findByEmail(username);
-
             if (userOptional.isPresent()) {
                 User existingUser = userOptional.get();
-
-
                 UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
                 userDetailsResponse.setFirstName(existingUser.getFirstName ());
                 userDetailsResponse.setLastName(existingUser.getLastName ());
                 userDetailsResponse.setEmail(existingUser.getEmail());
-
-
                 return userDetailsResponse;
             } else {
                 throw new CustomAuthenticationException ("User not found");
@@ -54,23 +49,16 @@ public class UserServiceImpl implements UserService {
         try {
             String username = jwtService.extractUsername(token.substring ( 7 ));
             Optional<User> optionalUser = userRepository.findByEmail(username);
-
             if (optionalUser.isPresent()) {
                 User existingUser = optionalUser.get();
-                // Update user details
                 existingUser.setFirstName (userDetailsUpdateRequest.getFirtName ());
                 existingUser.setLastName (userDetailsUpdateRequest.getLastName ());
                 existingUser.setEmail(userDetailsUpdateRequest.getEmail());
 
 
-                if(userDetailsUpdateRequest.getPassword ().isPresent ()){
-                    System.out.println (userDetailsUpdateRequest.getPassword () +"ajith krkd");
+                if(userDetailsUpdateRequest.getPassword ().isPresent ()){System.out.println (userDetailsUpdateRequest.getPassword () +"ajith krkd");
                     String newPassword = userDetailsUpdateRequest.getPassword ().get();
-
-                    System.out.println (newPassword +"ajith lrd ajfpoasjkfpskjafdp");
                     existingUser.setPassword( passwordEncoder.encode ( newPassword ) );
-
-
                 }else {
                     System.out.println (existingUser.getPassword () +"ajith" );
                     existingUser.setPassword (existingUser.getPassword (  ));
@@ -111,6 +99,10 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public Optional < User > findUserByName (String userName) {
+       return userRepository.findByEmail ( userName );
+    }
 
 
 }
