@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface NoteRepository extends JpaRepository< Note , Long > {
-//    @Query ("SELECT * FROM Note  WHERE user = :userId AND n.isDeleted = false AND n.isArchived = false")
-//    List<Note> findActiveNotesByUserId(@Param ("userId") User userId);
+    @Query("SELECT n FROM Note n WHERE n.user = :user AND n.isDeleted = false AND n.isArchived = false")
+    List<Note> findActiveNotesByUser(@Param("user") User user);
 
 }

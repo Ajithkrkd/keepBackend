@@ -3,8 +3,8 @@ package com.ajith.secondProject.note.Contorllers;
 import com.ajith.secondProject.note.NoteRequest;
 import com.ajith.secondProject.note.NoteResponse;
 import com.ajith.secondProject.note.entity.Note;
-import com.ajith.secondProject.note.repository.NoteRepository;
 import com.ajith.secondProject.note.service.NoteService;
+import com.ajith.secondProject.user.entity.User;
 import com.ajith.secondProject.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +22,6 @@ public class NoteController {
 
     private final NoteService noteService;
     private final UserService userService;
-    private final NoteRepository noteRepository;
     @PostMapping ("/createNote")
     public ResponseEntity<String> createNote(@RequestBody NoteRequest note, Principal principal) {
         try {
@@ -36,11 +36,11 @@ public class NoteController {
 
 
     @GetMapping("/getNote")
-    public ResponseEntity<NoteResponse> getAllNonDeletedAndNonArchivedNotes() {
+    public ResponseEntity<NoteResponse> getAllNonDeletedAndNonArchivedNotes(Principal principal) {
 
-
-
-            List < Note > nonDeletedAndNonArchivedNotes = noteRepository.findAll ();
+            String userName = principal.getName ();
+            Optional < User > user = userService.findUserByName(userName);
+            List < Note > nonDeletedAndNonArchivedNotes = noteService.getAllNonDeletedAndNonArchivedNotes (user.get());
             NoteResponse noteResponse = new NoteResponse();
             noteResponse.setMessage("Successfully retrieved notes");
             noteResponse.setNotes(nonDeletedAndNonArchivedNotes);

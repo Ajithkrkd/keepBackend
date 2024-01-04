@@ -43,11 +43,6 @@ public class AuthenticationService {
         User savedUser = userRepository.save ( user );
         var jwtToken = jwtService.generateToken ( user );
         var refreshToken = jwtService.generateRefreshToken ( user );
-        if(jwtToken.equals ( refreshToken ) ){
-            System.out.println ("---------------------------------------dupli" );
-        }else{
-            System.out.println ("---------------------------------------not dupli" );
-        }
         saveUserToken ( savedUser, refreshToken );
 
 
@@ -75,11 +70,7 @@ public class AuthenticationService {
             }
             var jwtToken = jwtService.generateToken(user);
             var refreshToken = jwtService.generateRefreshToken ( user );
-            if(jwtToken.equals ( refreshToken ) ){
-                System.out.println ("---------------------------------------dupli" );
-            }else{
-                System.out.println ("---------------------------------------not dupli" );
-            }
+
             revokeAllTokens ( user );
             saveUserToken ( user, refreshToken );
 
@@ -96,7 +87,7 @@ public class AuthenticationService {
         }
     }
 
-    private void revokeAllTokens(User user) {
+    public void revokeAllTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidTokensByUser ( user.getId () );
         if(validUserTokens.isEmpty()) {
             return;

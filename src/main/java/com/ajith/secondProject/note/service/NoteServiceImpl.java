@@ -30,7 +30,7 @@ public class NoteServiceImpl implements NoteService{
     }
 
     @Override
-    public List < Note > getAllNonDeletedAndNonArchivedNotes () {
-        return noteRepository.findAll (  );
+    public List < Note > getAllNonDeletedAndNonArchivedNotes (User user) {
+        return noteRepository.findActiveNotesByUser ( user );
     }
 }

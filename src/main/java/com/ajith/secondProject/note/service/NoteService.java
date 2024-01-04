@@ -9,5 +9,5 @@ import java.util.List;
 public interface NoteService {
     void createNote (NoteRequest note ,String userName);
 
-    List< Note> getAllNonDeletedAndNonArchivedNotes ();
+    List< Note> getAllNonDeletedAndNonArchivedNotes (User user);
 }
