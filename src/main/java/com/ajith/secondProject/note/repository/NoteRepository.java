@@ -13,4 +13,6 @@ public interface NoteRepository extends JpaRepository< Note , Long > {
     List<Note> findActiveNotesByUser(@Param("user") User user);
 
     List< Note> findAllNoteByUserIdAndIsDeletedTrue (Long userId);
+
+    List< Note> findAllNoteByUserIdAndIsArchivedTrue (Long id);
 }

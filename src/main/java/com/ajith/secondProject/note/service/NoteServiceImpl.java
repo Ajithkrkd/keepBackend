@@ -53,6 +53,47 @@ public class NoteServiceImpl implements NoteService{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Note not found");
         }
     }
+    @Override
+    public ResponseEntity < String > makeNoteArchived (Long noteId) {
+        Optional<Note> userNote = noteRepository.findById(noteId);
+
+        if (userNote.isPresent()) {
+            Note existingNote = userNote.get();
+            existingNote.setArchived (!existingNote.isArchived ());
+            noteRepository.save(existingNote);
+
+            return ResponseEntity.ok("Note " + (existingNote.isArchived () ? "archived" : "restored"));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Note not found");
+        }
+    }
+
+    @Override
+    public ResponseEntity < NoteResponse > getAllArchivedNotes (Principal principal) {
+        try {
+            String userEmail = principal.getName();
+            Optional<User> user = userRepository.findByEmail(userEmail);
+
+            if (user.isPresent()) {
+                User existingUser = user.get();
+                List<Note> notes = noteRepository.findAllNoteByUserIdAndIsArchivedTrue (existingUser.getId());
+                NoteResponse response = new NoteResponse();
+                response.setNotes(notes);
+                response.setMessage("Successfully retrieved the archived notes.");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                NoteResponse response = new NoteResponse();
+                response.setMessage("User does not exist.");
+                response.setNotes(new ArrayList<>());
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            NoteResponse response = new NoteResponse();
+            response.setMessage("Internal Server Error");
+            response.setNotes(new ArrayList<>());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @Override
     public ResponseEntity<NoteResponse> getAllDeletedNotes (Principal principal) {
@@ -80,5 +121,6 @@ public class NoteServiceImpl implements NoteService{
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 }

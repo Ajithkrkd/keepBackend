@@ -17,4 +17,8 @@ public interface NoteService {
     ResponseEntity<String> makeNoteDeleted (Long noteId);
 
     ResponseEntity<NoteResponse> getAllDeletedNotes (Principal principal);
+
+    ResponseEntity< String> makeNoteArchived (Long noteId);
+
+    ResponseEntity< NoteResponse> getAllArchivedNotes (Principal principal);
 }

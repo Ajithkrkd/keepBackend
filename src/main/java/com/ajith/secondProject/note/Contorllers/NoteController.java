@@ -66,4 +66,14 @@ public class NoteController {
     public ResponseEntity<NoteResponse> getAllDeletedNotes(Principal principal){
         return noteService.getAllDeletedNotes(principal);
     }
+    @GetMapping("/note/getAllArchivedNotes")
+    public ResponseEntity<NoteResponse> getAllArchivedNotes(Principal principal){
+        return noteService.getAllArchivedNotes(principal);
+    }
+
+    @PostMapping("/note/archive/{noteId}")
+    public ResponseEntity<String> makeNoteArchived(@PathVariable Long noteId)
+    {
+     return    noteService.makeNoteArchived(noteId);
+    }
 }
