@@ -97,6 +97,7 @@ public class AuthenticationService {
                     t.setRevoked ( true );
                     t.setExpired ( true );}
                  );
+            System.out.println ("Valid ---------------------------" );
                 tokenRepository.saveAll ( validUserTokens );
         }
     }
@@ -109,7 +110,7 @@ public class AuthenticationService {
         final  String authHeader = request.getHeader("Authorization");
         final String refreshToken;
         final String userEmail;
-        System.out.println (authHeader + "--------------------="  );
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return AuthenticationResponse.builder()
                     .error ( "Invalid Authorization header" )
@@ -121,6 +122,7 @@ public class AuthenticationService {
         userEmail = jwtService.extractUsername(refreshToken);
 
         if(userEmail != null ){
+
              Optional <User> existingUser = userRepository.findByEmail ( userEmail );
                 if(existingUser.isPresent ()){
                     User user = existingUser.get();
@@ -130,6 +132,7 @@ public class AuthenticationService {
                                     !token.isRevoked () &&
                                     !token.isExpired () )
                             .orElse ( false );
+
 
                     if(jwtService.isTokenValid ( refreshToken, user ) && isTokenValid ){
                       var accessToken = jwtService.generateToken ( user );

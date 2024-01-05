@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +39,7 @@ public class NoteController {
     @GetMapping("/getNote")
     public ResponseEntity<NoteResponse> getAllNonDeletedAndNonArchivedNotes(Principal principal) {
 
+        try {
             String userName = principal.getName ();
             Optional < User > user = userService.findUserByName(userName);
             List < Note > nonDeletedAndNonArchivedNotes = noteService.getAllNonDeletedAndNonArchivedNotes (user.get());
@@ -45,6 +47,23 @@ public class NoteController {
             noteResponse.setMessage("Successfully retrieved notes");
             noteResponse.setNotes(nonDeletedAndNonArchivedNotes);
             return ResponseEntity.ok(noteResponse);
+        }
+        catch (Exception e){
+            NoteResponse errorResponse = new NoteResponse();
+            errorResponse.setMessage("Successfully retrieved notes");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
 
+    }
+
+    @PostMapping("/note/delete/{noteId}")
+    public ResponseEntity<String> makeNoteDeleted(@PathVariable Long noteId)
+    {
+        return noteService.makeNoteDeleted(noteId);
+    }
+
+    @GetMapping("/note/getAllDeletedNotes")
+    public ResponseEntity<NoteResponse> getAllDeletedNotes(Principal principal){
+        return noteService.getAllDeletedNotes(principal);
     }
 }

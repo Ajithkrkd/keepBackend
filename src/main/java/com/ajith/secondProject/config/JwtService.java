@@ -25,13 +25,11 @@ public class JwtService {
     private long refreshExpiration ;
 
     public String extractUsername (String token) {
-        System.out.println ("from extract username" );
         return extractClaim (token, Claims::getSubject);
     }
 
 
     public <T>T extractClaim (String token, Function<Claims,T>claimsResolver) {
-        System.out.println ("from extract" );
         final Claims claims = extractAllClaims ( token );
         return claimsResolver.apply ( claims );
     }
@@ -46,26 +44,22 @@ public class JwtService {
     }
 
     private boolean isTokenExpired (String token) {
-        System.out.println ("hai from here" );
         return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration (String token) {
-        Date s = extractClaim ( token ,Claims::getExpiration );
-        return s;
+        return extractClaim ( token ,Claims::getExpiration );
     }
 
     public String generateToken(
             Map <String ,Object> extraClaims,
             UserDetails userDetails) {
-
         return buildToken ( extraClaims,userDetails,jwtExpiration );
 
     }
     public String generateRefreshToken(
             UserDetails userDetails) {
-
-        return buildToken (new HashMap <> (),userDetails,refreshExpiration );
+            return buildToken (new HashMap <> (),userDetails,refreshExpiration );
 
     }
 
@@ -99,9 +93,7 @@ public class JwtService {
     }
 
     private Key getSigningKey ( ) {
-        System.out.println ( "get key" );
         byte[] keyBytes = Decoders.BASE64.decode (secretKey);
-        System.out.println ("hai" + secretKey );
         return Keys.hmacShaKeyFor (keyBytes);
     }
 }

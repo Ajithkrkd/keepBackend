@@ -12,4 +12,5 @@ public interface NoteRepository extends JpaRepository< Note , Long > {
     @Query("SELECT n FROM Note n WHERE n.user = :user AND n.isDeleted = false AND n.isArchived = false")
     List<Note> findActiveNotesByUser(@Param("user") User user);
 
+    List< Note> findAllNoteByUserIdAndIsDeletedTrue (Long userId);
 }
