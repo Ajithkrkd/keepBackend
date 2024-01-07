@@ -1,9 +1,11 @@
 package com.ajith.secondProject.note.Contorllers;
 
+import com.ajith.secondProject.noteColor.ColorResponse;
 import com.ajith.secondProject.note.NoteRequest;
 import com.ajith.secondProject.note.NoteResponse;
 import com.ajith.secondProject.note.entity.Note;
 import com.ajith.secondProject.note.service.NoteService;
+import com.ajith.secondProject.noteColor.service.NoteColorService;
 import com.ajith.secondProject.user.entity.User;
 import com.ajith.secondProject.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public class NoteController {
 
     private final NoteService noteService;
     private final UserService userService;
+    private final NoteColorService noteColorService;
     @PostMapping ("/createNote")
     public ResponseEntity<String> createNote(@RequestBody NoteRequest note, Principal principal) {
         try {
@@ -75,5 +77,18 @@ public class NoteController {
     public ResponseEntity<String> makeNoteArchived(@PathVariable Long noteId)
     {
      return    noteService.makeNoteArchived(noteId);
+    }
+
+    @GetMapping("/note/getAllBackgroundColors")
+    public ResponseEntity< ColorResponse > getAllBackgroundColors()
+    {
+        return noteColorService.getAllBackgroundColors();
+    }
+
+    @PostMapping("/note/changeNoteColor/{colorId}/{noteId}")
+    public ResponseEntity<String> changeNotBackGroundColor(@PathVariable Integer colorId,@PathVariable Long noteId )
+    {
+        return noteColorService.changeNotBackGroundColor(colorId,noteId);
+
     }
 }

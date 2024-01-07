@@ -21,4 +21,6 @@ public interface NoteService {
     ResponseEntity< String> makeNoteArchived (Long noteId);
 
     ResponseEntity< NoteResponse> getAllArchivedNotes (Principal principal);
+
+
 }

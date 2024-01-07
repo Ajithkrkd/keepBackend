@@ -95,6 +95,10 @@ public class NoteServiceImpl implements NoteService{
         }
     }
 
+
+
+
+
     @Override
     public ResponseEntity<NoteResponse> getAllDeletedNotes (Principal principal) {
         try {

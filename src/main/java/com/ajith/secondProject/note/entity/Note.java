@@ -1,8 +1,8 @@
 package com.ajith.secondProject.note.entity;
 
+import com.ajith.secondProject.noteColor.entity.NoteBackGroundColor;
 import com.ajith.secondProject.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +20,9 @@ public class Note {
         private String subTitle;
         private boolean isArchived = false;
         private boolean isDeleted = false;
+    @ManyToOne
+    @JoinColumn(name = "note_color_id")
+        private NoteBackGroundColor noteColor;
         @JsonIgnore
         @ManyToOne
         @JoinColumn(name = "user")
