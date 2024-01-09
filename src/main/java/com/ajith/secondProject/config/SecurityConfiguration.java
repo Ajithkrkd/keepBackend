@@ -1,4 +1,5 @@
 package com.ajith.secondProject.config;
+import com.ajith.secondProject.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +24,10 @@ public class SecurityConfiguration {
         return http.csrf ( AbstractHttpConfigurer::disable )
 
                 .authorizeHttpRequests ( auth -> {
-                    auth.requestMatchers ( "/api/auth/**"  )
+                    auth.requestMatchers ( "/api/auth/**")
                             .permitAll ( )
+                            .requestMatchers ( "/api/admin/**" ).hasAuthority ( String.valueOf ( Role.ADMIN ) )
+                            .requestMatchers ( "/api/users/**" ).hasAuthority ( String.valueOf ( Role.USER ) )
                             .anyRequest ( ).authenticated ( );
 
                 } )
