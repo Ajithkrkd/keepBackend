@@ -7,6 +7,7 @@ import com.ajith.secondProject.user.entity.User;
 import com.ajith.secondProject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -78,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-    public void blockUser(Long userId) {
+    public ResponseEntity < String > blockUser(Long userId) {
         try {
             Optional < User > optionalUser = userRepository.findById ( userId );
             if ( optionalUser.isPresent ( ) ) {
@@ -91,6 +92,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             throw new ResponseStatusException ( HttpStatus.INTERNAL_SERVER_ERROR, "Error blocking user", e);
         }
+        return null;
     }
 
     @Override

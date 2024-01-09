@@ -62,7 +62,7 @@ public class AuthenticationController {
             return ResponseEntity.status(403).body("User not found");
         }
         catch (UserBlockedException e) {
-            return ResponseEntity.status(403).body("user is blocked");
+            throw new UserBlockedException ( e.getMessage() );
         }
 
         catch (BadCredentialsException e) {
@@ -104,6 +104,7 @@ public class AuthenticationController {
             return ResponseEntity.status( HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
+
 
 
 
